@@ -29,6 +29,8 @@ The following data and scripts (excluding the code available in the Logparser pa
 - `project_parser.py` runs Drain on `HDFS.log` which contains x lines of unstructured log data. The script produces the log message template and structured log data output in csv format to the `project_parsed` folder. 
 - the `project_parsed` folder also contains the file `anomaly_label.csv` which provides a label whether each HDFS block in the `HDFS.log` file in normal or anomalous.
 
+The `*_parser.py` scripts are based on the Drain demo scripts available [here](https://github.com/logpai/logparser/tree/master/demo).
+
 Additional details of the `HDFS.log` file are provided in the paper:
 - Wei Xu, Ling Huang, Armando Fox, David Patterson, Michael Jordan. [Detecting Large-Scale System Problems by Mining Console Logs](https://people.eecs.berkeley.edu/~jordan/papers/xu-etal-sosp09.pdf), in Proc. of the 22nd ACM Symposium on Operating Systems Principles (SOSP), 2009. 
 
