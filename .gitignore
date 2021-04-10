@@ -130,3 +130,6 @@ dmypy.json
 
 # vscode
 .vscode
+
+# large raw data file
+HDFS.log

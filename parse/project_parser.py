@@ -2,8 +2,8 @@ import sys
 
 from logparser import Drain
 
-input_dir = "example_data/"  # The input directory of log file
-output_dir = "example_result/"  # The output directory of parsing results
+input_dir = "project_raw/"  # The input directory of log file
+output_dir = "project_parsed/"  # The output directory of parsing results
 log_file = "HDFS_2k.log"  # The input log file name
 log_format = "<Date> <Time> <Pid> <Level> <Component>: <Content>"  # HDFS log format
 # Regular expression list for optional preprocessing (default: [])
