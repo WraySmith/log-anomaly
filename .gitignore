@@ -56,7 +56,7 @@ coverage.xml
 *.pot
 
 # Django stuff:
-*.log
+#*.log currently commented out as using .log files in repo
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
