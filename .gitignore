@@ -131,5 +131,12 @@ dmypy.json
 # vscode
 .vscode
 
-# large raw data file
+# large raw and parsed data files
 HDFS.log
+HDFS_train.log
+HDFS_test.log_structured.csv
+HDFS_train.log_structured.csv
+HDFS_test.log_templates.csv
+HDFS_train.log_templates.csv
+HDFS.log_structured.csv
+HDFS.log_templates.csv

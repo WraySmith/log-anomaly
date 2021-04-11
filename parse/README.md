@@ -26,10 +26,10 @@ Information on the HDFS data can be found [here](https://github.com/logpai/loghu
 The following data and scripts (excluding the code available in the Logparser package) include:
 
 - `example_parser.py` runs Drain on `HDFS_2k.log` which contains 2,000 lines of HDFS log data. The script produces the log message template and structured log data output in csv format to the `example_parsed` folder. 
-- `project_parser.py` runs Drain on `HDFS.log` which contains x lines of unstructured log data. The script produces the log message template and structured log data output in csv format to the `project_parsed` folder. 
-- the `project_parsed` folder also contains the file `anomaly_label.csv` which provides a label whether each HDFS block in the `HDFS.log` file in normal or anomalous.
+- `project_parser.py` runs Drain on the `HDFS.log` and `HDFS_train.log` files which contains approximately 11.2M and 8.9M lines of unstructured log data, respectively. The script produces the log message template and structured log data output in csv format to the `project_parsed` folder. Note that `HDFS.log`, `HDFS_train.log` and the output from `project_parser.py` are not stored in this repo as they are files larger than 1 GB. However, the `raw_data.ipynb ` file provides instructions on downloading the raw data and generating the parsed data.
+- The `project_parsed` folder also contains the file `anomaly_label.csv` which provides a label whether each HDFS block in the `HDFS.log` file is normal or anomalous.
 
-The `*_parser.py` scripts are based on the Drain demo scripts available [here](https://github.com/logpai/logparser/tree/master/demo).
+Note that the `*_parser.py` scripts are based on the Drain demo scripts available [here](https://github.com/logpai/logparser/tree/master/demo).
 
 Additional details of the `HDFS.log` file are provided in the paper:
 - Wei Xu, Ling Huang, Armando Fox, David Patterson, Michael Jordan. [Detecting Large-Scale System Problems by Mining Console Logs](https://people.eecs.berkeley.edu/~jordan/papers/xu-etal-sosp09.pdf), in Proc. of the 22nd ACM Symposium on Operating Systems Principles (SOSP), 2009. 
