@@ -7,7 +7,6 @@ import time
 import re
 from collections import OrderedDict
 from collections import Counter
-from scipy.special import expit
 
 
 def collect_event_ids(data_frame):
@@ -41,9 +40,8 @@ class FeatureExtractor(object):
         self.idf_vec = None
         self.events = None
         self.term_weighting = None
-        self.normalization = None
 
-    def fit_transform(self, X_seq, term_weighting=None, normalization=None):
+    def fit_transform(self, X_seq, term_weighting=None):
         """
         Fit and transform the training set
         X_Seq: ndarray,  log sequences matrix
@@ -51,7 +49,6 @@ class FeatureExtractor(object):
         normalization: None - not implemented yet
         """
         self.term_weighting = term_weighting
-        self.normalization = normalization
 
         # Convert into bag of words
         X_counts = []
@@ -70,14 +67,6 @@ class FeatureExtractor(object):
             self.idf_vec = np.log(num_instance / (df_vec + 1e-8))
             idf_matrix = X * np.tile(self.idf_vec, (num_instance, 1))
             X = idf_matrix
-
-        # normalization if parameter
-        if self.normalization == "zero-mean":
-            mean_vec = X.mean(axis=0)
-            self.mean_vec = mean_vec.reshape(1, num_event)
-            X = X - np.tile(self.mean_vec, (num_instance, 1))
-        elif self.normalization == "sigmoid":
-            X[X != 0] = expit(X[X != 0])  # expit is logistic sigmoid for ndarrays
 
         X_new = X
         print("Train data shape: {}-by-{}\n".format(X_new.shape[0], X_new.shape[1]))
@@ -107,11 +96,6 @@ class FeatureExtractor(object):
             idf_matrix = X * np.tile(self.idf_vec, (num_instance, 1))
             X = idf_matrix
 
-        # applies normalization if parameter
-        if self.normalization == "zero-mean":
-            X = X - np.tile(self.mean_vec, (num_instance, 1))
-        elif self.normalization == "sigmoid":
-            X[X != 0] = expit(X[X != 0])
         X_new = X
         print("Test data shape: {}-by-{}\n".format(X_new.shape[0], X_new.shape[1]))
         return X_new
@@ -121,8 +105,8 @@ if __name__ == "__main__":
 
     start = time.time()
 
-    # train = pd.read_csv("./train_subset.csv") # for testing
-    train = pd.read_csv("./HDFS_train.log_structured.csv")
+    train = pd.read_csv("./train_subset.csv")  # for testing
+    # train = pd.read_csv("./HDFS_train.log_structured.csv")
     lab = pd.read_csv("./anomaly_label.csv")
     print("data loaded")
 
