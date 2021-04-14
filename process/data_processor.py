@@ -9,7 +9,7 @@ from collections import OrderedDict
 from collections import Counter
 
 
-def collect_event_ids(data_frame):
+def collect_event_ids(data_frame, regex_pattern, column_names):
     """
     turns input data_frame into a 2 columned dataframe
     with columns: BlockId, EventSequence
@@ -17,15 +17,13 @@ def collect_event_ids(data_frame):
     """
     data_dict = OrderedDict()
     for _, row in data_frame.iterrows():
-        blk_id_list = re.findall(r"(blk_-?\d+)", row["Content"])
+        blk_id_list = re.findall(regex_pattern, row["Content"])
         blk_id_set = set(blk_id_list)
         for blk_id in blk_id_set:
             if not blk_id in data_dict:
                 data_dict[blk_id] = []
             data_dict[blk_id].append(row["EventId"])
-    data_df = pd.DataFrame(
-        list(data_dict.items()), columns=["BlockId", "EventSequence"]
-    )
+    data_df = pd.DataFrame(list(data_dict.items()), columns=column_names)
     return data_df
 
 
@@ -111,7 +109,9 @@ if __name__ == "__main__":
     print("data loaded")
 
     # Convert to blockId and EventSequence dataframe
-    events_df = collect_event_ids(train).merge(lab, on="BlockId")
+    re_pat = r"(blk_-?\d+)"
+    col_names = ["BlockId", "EventSequence"]
+    events_df = collect_event_ids(train, re_pat, col_names).merge(lab, on="BlockId")
 
     # Convert label column to binary
     events_df["Label"] = events_df["Label"].apply(lambda x: 1 if x == "Anomaly" else 0)
