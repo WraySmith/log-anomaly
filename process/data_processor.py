@@ -112,8 +112,9 @@ class FeatureExtractor(object):
         # INSTEAD OF THE CURRENT 0-5, 5-10, 10-15 (CAN'T DO THIS BEFORE DOCUMENT COUNT)
         # 3: APPLY DOCUMENT VECTOR
         # STEPS 1 AND 3 SHOULD BE EASYISH
+        # STEP 2 AND 3 COULD POTENTIALLY BE REVERSED
         num_instance, num_event = X.shape
-        # applies tf-idf if pararmeter
+        # applies tf-idf if parameter
         if self.term_weighting == "tf-idf":
             df_vec = np.sum(X > 0, axis=0)
             self.idf_vec = np.log(num_instance / (df_vec + 1e-8))
