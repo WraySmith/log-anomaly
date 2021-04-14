@@ -100,6 +100,7 @@ class FeatureExtractor(object):
             # put into dataframe to add nas to missing events
             # divide by 20 as original operation multiplied by 20
             block_df = pd.DataFrame(block_counts, columns=self.events) / 20
+            block_df = block_df.fillna(0)
             block_np = block_df.to_numpy()
             all_blocks_count.append(block_np)
 
@@ -174,6 +175,7 @@ class FeatureExtractor(object):
             # put into dataframe to add nas to missing events
             # divide by 20 as original operation multiplied by 20
             block_df = pd.DataFrame(block_counts, columns=self.events) / 20
+            block_df = block_df.fillna(0)
             block_np = block_df.to_numpy()
             all_blocks_count.append(block_np)
 
