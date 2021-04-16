@@ -70,14 +70,15 @@ class FeatureExtractor(object):
         print("Train data shape: {}-by-{}\n".format(X_new.shape[0], X_new.shape[1]))
         return X_new
 
-    def fit_transform_subblocks(self, X_seq, term_weighting=None):
+    def fit_transform_subblocks(self, X_seq, term_weighting=None, rolling=False):
         """
         Fit and transform the training set
         X_Seq: ndarray,  log sequences matrix
         term_weighting: None or `tf-idf`
-        normalization: None - not implemented yet
+        rolling: Bool, default False, if True, applies a 2 window rolling sum to the dataframes
         """
         self.term_weighting = term_weighting
+        self.rolling = rolling
 
         # get unique events
         unique_events = set()
@@ -100,30 +101,38 @@ class FeatureExtractor(object):
             # put into dataframe to add nas to missing events
             # divide by 20 as original operation multiplied by 20
             block_df = pd.DataFrame(block_counts, columns=self.events) / 20
+            block_df = block_df.reindex(sorted(block_df.columns), axis=1)
             block_df = block_df.fillna(0)
+            if self.rolling:
+                block_df = block_df.rolling(window=2).sum()
+                block_df = block_df.dropna()
+
             block_np = block_df.to_numpy()
             all_blocks_count.append(block_np)
 
         # finally stack the blocks
         X = np.stack(all_blocks_count)
 
-        # CODE BELOW HERE IS NOT UPDATED
-        # NEED TO 1: GET DOCUMENT COUNT (COULD POTENTIALLY BE INCORPORATED IN THE ABOVE BLOCK)
-        # 2: APPLY THE SLIDE WINDOW SUCH THAT THE FINAL RESULT IS 20 ROWS OF 0-10, 5-15, 10-25
-        # INSTEAD OF THE CURRENT 0-5, 5-10, 10-15 (CAN'T DO THIS BEFORE DOCUMENT COUNT)
-        # 3: APPLY DOCUMENT VECTOR
-        # STEPS 1 AND 3 SHOULD BE EASYISH
-        # STEP 2 AND 3 COULD POTENTIALLY BE REVERSED
-        num_instance, num_event = X.shape
-        # applies tf-idf if parameter
+        # applies tf-idf if pararmeter
         if self.term_weighting == "tf-idf":
+
+            # Set up sizing
+            num_instance, _, _ = X.shape
+            dim1, dim2, dim3 = X.shape
+            X = X.reshape(-1, dim3)
+
+            # apply tf-idf
             df_vec = np.sum(X > 0, axis=0)
             self.idf_vec = np.log(num_instance / (df_vec + 1e-8))
-            idf_matrix = X * np.tile(self.idf_vec, (num_instance, 1))
+            idf_tile = np.tile(self.idf_vec, (num_instance * dim2, 1))
+            idf_matrix = X * idf_tile
             X = idf_matrix
 
+            # reshape to original dimensions
+            X = X.reshape(dim1, dim2, dim3)
+
         X_new = X
-        print("Train data shape: {}-by-{}\n".format(X_new.shape[0], X_new.shape[1]))
+        print("Train data shape: ", X_new.shape)
         return X_new
 
     def transform(self, X_seq):
@@ -175,22 +184,36 @@ class FeatureExtractor(object):
             # put into dataframe to add nas to missing events
             # divide by 20 as original operation multiplied by 20
             block_df = pd.DataFrame(block_counts, columns=self.events) / 20
+            block_df = block_df.reindex(sorted(block_df.columns), axis=1)
             block_df = block_df.fillna(0)
+            if self.rolling:
+                block_df = block_df.rolling(window=2).sum()
+                block_df = block_df.dropna()
+
             block_np = block_df.to_numpy()
             all_blocks_count.append(block_np)
 
         # finally stack the blocks
         X = np.stack(all_blocks_count)
 
-        # CODE BELOW HERE NOT MODIFIED
         # applies tf-idf if parameter
-        num_instance, _ = X.shape
         if self.term_weighting == "tf-idf":
-            idf_matrix = X * np.tile(self.idf_vec, (num_instance, 1))
+
+            # set up sizing and reshape for tf-idf
+            num_instance, _, _ = X.shape
+            dim1, dim2, dim3 = X.shape
+            X = X.reshape(-1, dim3)
+
+            # applies tf-idf
+            idf_tile = idf_tile = np.tile(self.idf_vec, (num_instance * dim2, 1))
+            idf_matrix = X * idf_tile
             X = idf_matrix
 
+            # reshape to original dimensions
+            X = X.reshape(dim1, dim2, dim3)
+
         X_new = X
-        print("Test data shape: {}-by-{}\n".format(X_new.shape[0], X_new.shape[1]))
+        print("Test data shape: ", X_new.shape)
         return X_new
 
 
@@ -198,37 +221,27 @@ if __name__ == "__main__":
 
     start = time.time()
 
-    train = pd.read_csv("./train_subset.csv")  # for testing
-    # train = pd.read_csv("./HDFS_train.log_structured.csv")
-    lab = pd.read_csv("./anomaly_label.csv")
-    print("data loaded")
+    train = pd.read_csv("HDFS_100k.log_structured.csv")
 
-    # Convert to blockId and EventSequence dataframe
     re_pat = r"(blk_-?\d+)"
     col_names = ["BlockId", "EventSequence"]
-    events_df = collect_event_ids(train, re_pat, col_names).merge(lab, on="BlockId")
 
-    # Convert label column to binary
-    events_df["Label"] = events_df["Label"].apply(lambda x: 1 if x == "Anomaly" else 0)
-
-    # select only events
+    events_df = collect_event_ids(train, re_pat, col_names)
     events = events_df["EventSequence"].values
 
-    # init feature extractor
     fe = FeatureExtractor()
 
-    # fit and transform x_train
-    print("fitting and transforming x train")
-    x_train = fe.fit_transform(events, term_weighting="tf-idf")
+    print("rolling = True")
+    subblocks = fe.fit_transform_subblocks(
+        events, term_weighting="tf-idf", rolling=True
+    )
 
-    # transform x_test
-    print("transforming x test")
-    x_fake_test = fe.transform(events)
+    test1 = ["E1", "E2", "E1"]
+    test2 = ["E3", "E2", "E5"]
+    events = np.array([test1, test2])
 
-    # x_train and x_fake_test should be equal
-    # x_train was fit and transformed
-    # x_fake_test was transformed on the fit parameters
-    # simple testing, to be removed
-    print("are the two results equal? ", np.array_equal(x_train, x_fake_test))
+    print("rolling = False")
+    subblocks = fe.fit_transform_subblocks(events, term_weighting="tf-idf")
+    fake_test = fe.transform_subblock(events)
 
     print("time taken :", time.time() - start)
