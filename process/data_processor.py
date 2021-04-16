@@ -80,8 +80,6 @@ class FeatureExtractor(object):
         self.term_weighting = term_weighting
         self.rolling = rolling
 
-        print(X_seq.shape)
-
         # get unique events
         unique_events = set()
         for i in X_seq:
@@ -91,7 +89,6 @@ class FeatureExtractor(object):
         # Convert into bag of words
         all_blocks_count = []
         for block in X_seq:
-            print(block)
             # multiply block by 20 for 5% partitions
             block_rep = np.repeat(block, 20)
             # now split into 5% partitions
@@ -135,7 +132,7 @@ class FeatureExtractor(object):
             X = X.reshape(dim1, dim2, dim3)
 
         X_new = X
-        print("Train data shape: {}-by-{}\n".format(X_new.shape[0], X_new.shape[1]))
+        print("Train data shape: ", X_new.shape)
         return X_new
 
     def transform(self, X_seq):
@@ -175,8 +172,6 @@ class FeatureExtractor(object):
         # Convert into bag of words
         all_blocks_count = []
         for block in X_seq:
-            print("this is block")
-            print(block)
             # multiply block by 20 for 5% partitions
             block_rep = np.repeat(block, 20)
             # now split into 5% partitions
@@ -218,7 +213,7 @@ class FeatureExtractor(object):
             X = X.reshape(dim1, dim2, dim3)
 
         X_new = X
-        print("Test data shape: {}-by-{}\n".format(X_new.shape[0], X_new.shape[1]))
+        print("Test data shape: ", X_new.shape)
         return X_new
 
 
@@ -226,39 +221,26 @@ if __name__ == "__main__":
 
     start = time.time()
 
-    # train = pd.read_csv("HDFS_100k.log_structured.csv")
-    # print(train.shape)
-    # print(train.head())
+    train = pd.read_csv("HDFS_100k.log_structured.csv")
 
-    # re_pat = r"(blk_-?\d+)"
-    # col_names = ["BlockId", "EventSequence"]
+    re_pat = r"(blk_-?\d+)"
+    col_names = ["BlockId", "EventSequence"]
 
-    # events_df = collect_event_ids(train, re_pat, col_names)
-    # events = events_df["EventSequence"].values
-    # # print(events[:3].apply(",".join()))
+    events_df = collect_event_ids(train, re_pat, col_names)
+    events = events_df["EventSequence"].values
 
-    # def f(x):
-    #     return " ".join(x)
+    fe = FeatureExtractor()
 
-    # words_list = np.vectorize(f)(events[:3])
-
-    # vectorizer = TfidfVectorizer()
-    # vectors = vectorizer.fit_transform(words_list)
-    # feature_names = vectorizer.get_feature_names()
-    # dense = vectors.todense()
-    # denselist = dense.tolist()
-    # df = pd.DataFrame(denselist, columns=feature_names)
-
-    # print(df.head())
-
-    # exit()
+    print("rolling = True")
+    subblocks = fe.fit_transform_subblocks(
+        events, term_weighting="tf-idf", rolling=True
+    )
 
     test1 = ["E1", "E2", "E1"]
     test2 = ["E3", "E2", "E5"]
     events = np.array([test1, test2])
 
-    fe = FeatureExtractor()
-
+    print("rolling = False")
     subblocks = fe.fit_transform_subblocks(events, term_weighting="tf-idf")
     fake_test = fe.transform_subblock(events)
 
