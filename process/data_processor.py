@@ -163,7 +163,7 @@ class FeatureExtractor(object):
         print("Test data shape: {}-by-{}\n".format(X_new.shape[0], X_new.shape[1]))
         return X_new
 
-    def transform_subblock(self, X_seq):
+    def transform_subblocks(self, X_seq):
         """
         transforms x test
         X_seq: log sequence data
@@ -221,27 +221,50 @@ if __name__ == "__main__":
 
     start = time.time()
 
-    train = pd.read_csv("HDFS_100k.log_structured.csv")
+    print("loading y")
+    y = pd.read_csv("./anomaly_label.csv")
+
+    print("loading x_train")
+    x_train = pd.read_csv("HDS_train.log_structured.csv")
+
+    print("loading x_test")
+    x_test = pd.read_csv("HDS_test.log_structured.csv")
 
     re_pat = r"(blk_-?\d+)"
     col_names = ["BlockId", "EventSequence"]
 
-    events_df = collect_event_ids(train, re_pat, col_names)
-    events = events_df["EventSequence"].values
+    print("collecting events for x_train")
+    events_train = collect_event_ids(x_train, re_pat, col_names)
+    print("collecting events for x_test")
+    events_test = collect_event_ids(x_test, re_pat, col_names)
+
+    print("merging block frames with labels")
+    events_train = events_train.merge(y, on="BlockId")
+    events_test = events_test.merge(y, on="BlockId")
+
+    events_train_values = events_train["EventSequence"].values
+    events_test_values = events_test["EventSequence"].values
 
     fe = FeatureExtractor()
 
-    print("rolling = True")
-    subblocks = fe.fit_transform_subblocks(
-        events, term_weighting="tf-idf", rolling=True
+    print("fit_transform x_train")
+    subblocks_train = fe.fit_transform_subblocks(
+        events_train_values, term_weighting="tf-idf", rolling=True
     )
 
-    test1 = ["E1", "E2", "E1"]
-    test2 = ["E3", "E2", "E5"]
-    events = np.array([test1, test2])
+    print("transform x_test")
+    subblocks_test = fe.transform_subblocks(events_test_values)
 
-    print("rolling = False")
-    subblocks = fe.fit_transform_subblocks(events, term_weighting="tf-idf")
-    fake_test = fe.transform_subblock(events)
+    print("collecting y data")
+    y_train = events_train[["BlockId", "Label"]]
+    y_test = events_test[["BlockId", "Label"]]
+
+    print("writing y to csv")
+    y_train.to_csv("./y_train.csv")
+    y_test.to_csv("./y_test.csv")
+
+    print("saving x to numpy object")
+    np.save("./x_train.npy", subblocks_train)
+    np.save("./x_test.npy", subblocks_test)
 
     print("time taken :", time.time() - start)
