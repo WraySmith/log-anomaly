@@ -225,10 +225,10 @@ if __name__ == "__main__":
     y = pd.read_csv("./anomaly_label.csv")
 
     print("loading x_train")
-    x_train = pd.read_csv("HDS_train.log_structured.csv")
+    x_train = pd.read_csv("HDFS_train.log_structured.csv")
 
     print("loading x_test")
-    x_test = pd.read_csv("HDS_test.log_structured.csv")
+    x_test = pd.read_csv("HDFS_test.log_structured.csv")
 
     re_pat = r"(blk_-?\d+)"
     col_names = ["BlockId", "EventSequence"]
