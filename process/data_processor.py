@@ -219,6 +219,8 @@ class FeatureExtractor(object):
 
 if __name__ == "__main__":
 
+    data_version = "_tf-idf_rolling_v2"
+
     start = time.time()
 
     print("loading y")
@@ -242,6 +244,11 @@ if __name__ == "__main__":
     events_train = events_train.merge(y, on="BlockId")
     events_test = events_test.merge(y, on="BlockId")
 
+    print("removing blocks that are overlapped into train and test")
+    overlapping_blocks = np.intersect1d(events_train["BlockId"], events_test["BlockId"])
+    events_train = events_train[~events_train["BlockId"].isin(overlapping_blocks)]
+    events_test = events_test[~events_test["BlockId"].isin(overlapping_blocks)]
+
     events_train_values = events_train["EventSequence"].values
     events_test_values = events_test["EventSequence"].values
 
@@ -260,11 +267,11 @@ if __name__ == "__main__":
     y_test = events_test[["BlockId", "Label"]]
 
     print("writing y to csv")
-    y_train.to_csv("./y_train.csv")
-    y_test.to_csv("./y_test.csv")
+    y_train.to_csv("./y_train{}.csv".format(data_version))
+    y_test.to_csv("./y_test{}.csv".format(data_version))
 
     print("saving x to numpy object")
-    np.save("./x_train.npy", subblocks_train)
-    np.save("./x_test.npy", subblocks_test)
+    np.save("./x_train{}.npy".format(data_version), subblocks_train)
+    np.save("./x_test{}.npy".format(data_version), subblocks_test)
 
     print("time taken :", time.time() - start)
