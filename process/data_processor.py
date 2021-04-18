@@ -3,7 +3,6 @@ loads and preprocesses the structured log data for anomaly prediction
 """
 import numpy as np
 import pandas as pd
-import time
 import re
 from collections import OrderedDict
 from collections import Counter
@@ -163,7 +162,7 @@ class FeatureExtractor(object):
         print("Test data shape: {}-by-{}\n".format(X_new.shape[0], X_new.shape[1]))
         return X_new
 
-    def transform_subblock(self, X_seq):
+    def transform_subblocks(self, X_seq):
         """
         transforms x test
         X_seq: log sequence data
@@ -215,33 +214,3 @@ class FeatureExtractor(object):
         X_new = X
         print("Test data shape: ", X_new.shape)
         return X_new
-
-
-if __name__ == "__main__":
-
-    start = time.time()
-
-    train = pd.read_csv("HDFS_100k.log_structured.csv")
-
-    re_pat = r"(blk_-?\d+)"
-    col_names = ["BlockId", "EventSequence"]
-
-    events_df = collect_event_ids(train, re_pat, col_names)
-    events = events_df["EventSequence"].values
-
-    fe = FeatureExtractor()
-
-    print("rolling = True")
-    subblocks = fe.fit_transform_subblocks(
-        events, term_weighting="tf-idf", rolling=True
-    )
-
-    test1 = ["E1", "E2", "E1"]
-    test2 = ["E3", "E2", "E5"]
-    events = np.array([test1, test2])
-
-    print("rolling = False")
-    subblocks = fe.fit_transform_subblocks(events, term_weighting="tf-idf")
-    fake_test = fe.transform_subblock(events)
-
-    print("time taken :", time.time() - start)
