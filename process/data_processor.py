@@ -221,16 +221,22 @@ if __name__ == "__main__":
 
     data_version = "_tf-idf_rolling_v2"
 
+    # where the "raw" data for this file is located
+    load_data_location = "../parse/project_parsed/"
+
+    # where the processed data is saved
+    save_location = "./project_processed_data/"
+
     start = time.time()
 
     print("loading y")
-    y = pd.read_csv("./anomaly_label.csv")
+    y = pd.read_csv("{}anomaly_label.csv".format(load_data_location))
 
     print("loading x_train")
-    x_train = pd.read_csv("HDFS_train.log_structured.csv")
+    x_train = pd.read_csv("{}HDFS_train.log_structured.csv".format(load_data_location))
 
     print("loading x_test")
-    x_test = pd.read_csv("HDFS_test.log_structured.csv")
+    x_test = pd.read_csv("{}HDFS_test.log_structured.csv".format(load_data_location))
 
     re_pat = r"(blk_-?\d+)"
     col_names = ["BlockId", "EventSequence"]
@@ -267,11 +273,11 @@ if __name__ == "__main__":
     y_test = events_test[["BlockId", "Label"]]
 
     print("writing y to csv")
-    y_train.to_csv("./y_train{}.csv".format(data_version))
-    y_test.to_csv("./y_test{}.csv".format(data_version))
+    y_train.to_csv("{}y_train{}.csv".format(save_location, data_version))
+    y_test.to_csv("{}y_test{}.csv".format(save_location, data_version))
 
     print("saving x to numpy object")
-    np.save("./x_train{}.npy".format(data_version), subblocks_train)
-    np.save("./x_test{}.npy".format(data_version), subblocks_test)
+    np.save("{}x_train{}.npy".format(save_location, data_version), subblocks_train)
+    np.save("{}x_test{}.npy".format(save_location, data_version), subblocks_test)
 
     print("time taken :", time.time() - start)
