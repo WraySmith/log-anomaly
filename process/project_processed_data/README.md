@@ -1,1 +1,1 @@
-# The output of `process/data_processor.py` is saved here
+## The output from of `process/project_processor.py` is saved here
