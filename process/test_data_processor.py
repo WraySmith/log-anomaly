@@ -34,7 +34,7 @@ def test_fit_and_transform_and_transform():
     fe = FeatureExtractor()
 
     subblocks_ft = fe.fit_transform_subblocks(test_data, term_weighting="tf-idf")
-    subblocks_t = fe.transform_subblock(test_data)
+    subblocks_t = fe.transform_subblocks(test_data)
 
     assert np.array_equal(subblocks_ft, subblocks_t)
 
@@ -65,6 +65,6 @@ def test_fit_and_transform_with_rolling():
     subblocks_ft = fe.fit_transform_subblocks(
         test_data, term_weighting="tf-idf", rolling=True
     )
-    subblocks_t = fe.transform_subblock(test_data)
+    subblocks_t = fe.transform_subblocks(test_data)
 
     assert np.array_equal(subblocks_ft, subblocks_t)
