@@ -33,6 +33,9 @@ The following provides a description of the files located in this folder:
     - `x_test_v2.npy`
     - `y_train_v2.csv`
     - `y_test_v2.csv`
+- The train sets are split into train sets (saved under the same name) and validation sets with `val_set_creator.py` and put into the `project_processed_data` folder as:
+    - `x_val_v2.npy`
+    - `y_val_v2.npy`
 - `process_demo.ipynb` provides a demo of using the processing script and is likely the best way to understand the feature extraction code at a high-level.
 
 - `test_data_processor.py` provides a small number of tests for `data_processor.py` and `check_processed_data.py` is used to check that the output after running `data_processor.py` is in the correct format. `check_processed_data.py` may be removed in the future.
