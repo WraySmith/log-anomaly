@@ -9,7 +9,7 @@ import pandas as pd
 
 def load_test_data():
     "loads test data of 100 rows"
-    df = pd.read_csv("./test_frame.csv", converters={"EventSequence": eval})
+    df = pd.read_csv("./testing_frame.csv", converters={"EventSequence": eval})
     return df
 
 

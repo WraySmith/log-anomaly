@@ -114,10 +114,8 @@ class FeatureExtractor(object):
 
             # resize if too large
             if len(time_image_np) > self.num_rows:
-                new_row_len = self.max_seq_length - self.window_size + 1
-
                 time_image_np = resize_time_image(
-                    time_image_np, (new_row_len, len(self.events)),
+                    time_image_np, (self.num_rows, len(self.events)),
                 )
 
             time_images.append(time_image_np)
@@ -168,10 +166,8 @@ class FeatureExtractor(object):
 
             # resize if too large
             if len(time_image_np) > self.num_rows:
-                new_row_len = self.max_seq_length - self.window_size + 1
-
                 time_image_np = resize_time_image(
-                    time_image_np, (new_row_len, len(self.events)),
+                    time_image_np, (self.num_rows, len(self.events)),
                 )
 
             time_images.append(time_image_np)
