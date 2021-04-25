@@ -27,7 +27,7 @@ def collect_event_ids(data_frame, regex_pattern, column_names):
     return data_df
 
 
-def windower(sequence, window_size=32):
+def windower(sequence, window_size):
     """
     creates an array of arrays of windows
     output array is of length: len(sequence) - window_size + 1
@@ -74,7 +74,7 @@ class FeatureExtractor(object):
         self.num_rows = None
 
     def fit_transform(
-        self, X_seq, term_weighting=None, length_percentile=90, window_size=32
+        self, X_seq, term_weighting=None, length_percentile=90, window_size=16
     ):
         """
         Fit and transform the training set
@@ -91,10 +91,7 @@ class FeatureExtractor(object):
 
         # get lengths of event sequences
         length_list = np.array(list(map(len, X_seq)))
-        if length_percentile != 100:
-            self.max_seq_length = int(np.percentile(length_list, length_percentile))
-        else:
-            self.max_seq_length = max(length_list)
+        self.max_seq_length = int(np.percentile(length_list, length_percentile))
 
         self.num_rows = self.max_seq_length - self.window_size + 1
 
