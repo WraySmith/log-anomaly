@@ -72,7 +72,6 @@ class FeatureExtractor(object):
         self.events = None
         self.term_weighting = None
         self.max_seq_length = None
-        # self.pad_to_length = None
         self.window_size = None
         self.num_rows = None
 
@@ -101,15 +100,7 @@ class FeatureExtractor(object):
 
         self.num_rows = self.max_seq_length - self.window_size + 1
 
-        print("num rows", self.num_rows)
-
-        print("final shape is ", self.num_rows, len(self.events))
-
-        print("window size", self.window_size)
-        print("max seq length", self.max_seq_length)
-        # right pad until length is an iteger multiple of window_size
-        # self.pad_to_length = math.ceil(self.max_seq_length / window_size) * window_size
-        # print("pad to length", self.pad_to_length)
+        print("final shape will be ", self.num_rows, len(self.events))
 
         # loop over each sequence to create the time image
         time_images = []
