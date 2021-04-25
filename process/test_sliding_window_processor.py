@@ -176,21 +176,3 @@ def test_resize_time_image():
     test_2_reshape = dp.resize_time_image(test_2, (10, 3))
     assert test_2_reshape.shape == (10, 3)
     assert np.allclose(test_2, test_2_reshape)
-
-
-if __name__ == "__main__":
-
-    data = load_test_data()
-    events = data["EventSequence"].values
-    # print(data.head())
-
-    # fe = dp.FeatureExtractor()
-
-    # X = fe.fit_transform(events, length_percentile=100, window_size=32)
-    # print(X.shape)
-
-    # test_fit_transfom()
-
-    # test_resize_time_image()
-
-    test_transform()
