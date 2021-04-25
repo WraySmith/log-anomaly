@@ -5,8 +5,7 @@ loads the semi-structured drain data, and processes it for the CNN
 import numpy as np
 import pandas as pd
 import time
-from data_processor_v2 import collect_event_ids, FeatureExtractor
-from sklearn.model_selection import train_test_split
+from sliding_window_processor import collect_event_ids, FeatureExtractor
 
 if __name__ == "__main__":
 

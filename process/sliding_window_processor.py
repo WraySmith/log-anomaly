@@ -1,13 +1,11 @@
 """
 loads and preprocesses the structured log data for anomaly prediction
 """
-import math
 import numpy as np
 import pandas as pd
 import re
 from collections import OrderedDict
 from collections import Counter
-from skimage.transform import resize
 from PIL import Image
 
 
