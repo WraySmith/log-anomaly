@@ -26,8 +26,13 @@ A description of Drain is provided at the following link:
 
 - [Drain: An Online Log Parsing Approach with Fixed Depth Tree](https://jiemingzhu.github.io/pub/pjhe_icws2017.pdf), by Pinjia He, Jieming Zhu, Zibin Zheng, and Michael R. Lyu.
 
+The raw unstructured HDFS log data is parsed using Drain to generate structured data in the form of log event templates and log variables.
 
-The raw unstructured HDFS log data is parsed using Drain to generate structured data in the form of log event templates and log variables. The log variables are used to identify groups of log data identified in this case by HDFS block ids. Log messages with the same block id are grouped together and lists of the sequence of events within the each block id are generated.
+<img src="images/Figure2.PNG" alt="Log Parsing" width="400"/>
+
+The log variables are used to identify groups of log data identified in this case by HDFS block ids. Log messages with the same block id are grouped together and lists of the sequence of events within the each block id are generated.
+
+<img src="images/Figure3.PNG" alt="Block ID Event List" width="400"/>
 
 ### Feature Extraction
 
@@ -35,7 +40,9 @@ The raw unstructured HDFS log data is parsed using Drain to generate structured 
 
  - **Event Counts/TF-IDF**: A count of events for each block id grouping is compiled using a bag of words approach. The total counts of each event for all groups is also compiled and TF-IDF is then applied resulting in a TF-IDF vector for each block id.
  - **Sliding Window Event Counts**: A sliding window that subsets the sequence of events within each block id is then applied. The event counts within each subset selection are used to generate a matrix for each block id with each subset event counts representing the rows.
- - **Final Feature Matrix**: The block id sliding window event count matrices are then multiplied by the corresponding block id TF-IDF vectors. This results in matrices based on TF-IDF values instead of event counts. 
+ - **Final Feature Matrix**: The block id sliding window event count matrices are then multiplied by the corresponding block id TF-IDF vectors. This results in matrices based on TF-IDF values instead of event counts.
+
+<img src="images/Figure4.PNG" alt="Feature Extraction Process" width="400"/>
 
  ### Log Anomaly Detection Model
  
