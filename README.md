@@ -8,7 +8,7 @@ The log anomaly detector uses the following steps:
 - **Feature Extraction**: TF-IDF on event counts and sliding windows to generate feature matrices.
 - **Log Anomaly Detection Model**: CNN model using the feature matrices as inputs and trained using labelled log data.
 
-The log anomaly detection model was tested using HDFS log data and was able to achieve precision, recall, and F-score values all greater than x.
+The log anomaly detection model was tested using HDFS log data and was able to achieve precision, recall, and F-score values all greater than 99%.
 
 ## Data
 
@@ -34,6 +34,7 @@ The log variables are used to identify groups of log data identified in this cas
 
 <img src="images/Figure3.PNG" alt="Block ID Event List" width="400"/>
 
+The [parse](./parse) folder contains the code used for parsing and provides additional details.
 ### Feature Extraction
 
  Feature extraction is performed on each log message grouping based on HDFS block ids. Feature extraction uses the following steps:
@@ -44,34 +45,42 @@ The log variables are used to identify groups of log data identified in this cas
 
 <img src="images/Figure4.PNG" alt="Feature Extraction Process" width="400"/>
 
+The [process](./process) folder contains the code used for feature extraction and provides additional details.
+
  ### Log Anomaly Detection Model
  
  The log anomaly detection model uses a shallow CNN architecture with two convolutional layers and two max pooling layers. The output from the last max pooling layer is passed into two multi-perceptron hidden layers. The final layer consists of two nodes representing anomalous and normal labels.
 
  The model was trained using the HDFS log data from [Loghub](https://github.com/logpai/loghub) which has block ids labelled as either normal or anomalous. An 80/20 test/train split was used.
 
+ The [model](./model) folder contains a notebook with the CNN log anomaly detection detection model.
+
 ## Results
 
-The results from the HDFS log data applied to the model are provided in the following tables. The results indicate that log anomaly detection process is performing extremely well based on the HDFS log dataset. 
+The results from the HDFS log data applied to the model are provided in the following tables. The results indicate that log anomaly detection process is performing extremely well based on the HDFS log dataset.
 
-**Model Classification Training Results**
-
-|  | True Normal | True Anomalous |
-| --- | --- | --- |
-| **Model Normal** | 123 | 123 |
-| **Model Anomalous** | 123 | 123 |
-
-**Model Classification Testing Results**
+**Training Classification**
 
 |  | True Normal | True Anomalous |
-| --- | --- | --- |
-| **Model Normal** | 123 | 123 |
-| **Model Anomalous** | 123 | 123 |
+| --- | ---: | ---: |
+| **Model Normal** | 305,715 | 12 |
+| **Model Anomalous** | 62 | 9,813 |
 
-**Model Performance Metrics Results**
+<br>
 
-|  | Precision | Recall | F-Score |
-| --- | --- | --- | --- |
-| **Training** | 123 | 123 | 123
-| **Testing** | 123 | 123 | 123
+**Testing Classification**
+
+|  | True Normal | True Anomalous |
+| --- | ---: | ---: |
+| **Model Normal** | 118,554 | 3 |
+| **Model Anomalous** | 0 | 1980 |
+
+<br>
+
+**Model Performance Metrics**
+
+|  | Precision (%) | Recall (%) | F-Score (%) |
+| --- | ---: | ---: | ---: |
+| **Training** | 99.4 | 99.9 | 99.6
+| **Testing** | 100.0 | 99.8 | 99.9
 
