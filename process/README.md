@@ -1,21 +1,24 @@
 # Process Folder
 
-Contains code to extract features from the semi-structured log files produced by the files contained within the `parse` directory. The data generated in this folder is used directly by the CNN model.
+Contains code to extract features from the structured log files produced within the `parse` directory. The data generated in this folder is used directly by the CNN model for log anomaly detection.
 
 ## Feature Extraction Overview
 
-The code in this directory borrows heavily from the feature extraction functionality of the [Loglizer](https://github.com/logpai/loglizer) project. 
+The code in this directory borrows some functionality from the [Loglizer](https://github.com/logpai/loglizer) project:
 
-+ Shilin He, Jieming Zhu, Pinjia He, Michael R. Lyu. [Experience Report: System Log Analysis for Anomaly Detection](https://jiemingzhu.github.io/pub/slhe_issre2016.pdf), *IEEE International Symposium on Software Reliability Engineering (ISSRE)*, 2016.
+- Shilin He, Jieming Zhu, Pinjia He, Michael R. Lyu. [Experience Report: System Log Analysis for Anomaly Detection](https://jiemingzhu.github.io/pub/slhe_issre2016.pdf), *IEEE International Symposium on Software Reliability Engineering (ISSRE)*, 2016.
 
+Loglizer takes structured log data and creates a list of log template events corresponding with each HDFS block id (or some other log grouping depending on the type of log data). Bag of Words (BoW) or TF-IDF is then completed on the lists of log events. This results in a dataframe with rows representing block ids, columns representing log event templates, and the values as the corresponding BoW or TF-IDF values. This dataframe can then be input to a predictive model.
 
-Loglizer takes semi-structured log files and turns them into a dataframe, with one column as the block ids and another column the block's events stored as a list. Then turns the event lists into a bag of words, with options for normalization and TF-IDF, to be fed into a predictive model.
+This project uses the framework of Loglizer's feature extraction but uses the following approach adding functionality as required:
 
-This repository uses the framework of Loglizer's feature extraction but adds the following functionality:
+- **Event Counts/TF-IDF**: A count of events for each block id grouping is compiled using a bag of words approach. The total counts of each event for all groups is also compiled and TF-IDF is then applied resulting in a TF-IDF vector for each block id. This is the same functionality that exists in Loglizer.
+ - **Sliding Window Event Counts**: A sliding window that subsets the sequence of events within each block id is then applied. The event counts within each subset selection are used to generate a matrix for each block id with each subset event counts representing the rows.
+ - **Final Feature Matrix**: The block id sliding window event count matrices are then multiplied by the corresponding block id TF-IDF vectors. This results in matrices based on TF-IDF values instead of event counts.
 
-- Applies a sliding window to the event sequences to create "time-images"
-- TF-IDF is then performed on the 2D time-image arrays
-- The output is an array of 2D arrays for each block.
+ A representation of the process is provided below:
+
+ <img src="../images/Figure4.PNG" alt="Feature Extraction Process" width="400"/>
 
 ## Data and Scripts
 
