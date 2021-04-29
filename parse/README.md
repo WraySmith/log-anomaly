@@ -2,6 +2,8 @@
 
 Contains code to parse raw unstructured log files to the structured form required by the feature extraction and anomaly detection algorithms.
 
+<img src="../images/Figure2.PNG" alt="Log Parsing" width="400"/>
+
 ## Drain Log Parser
 
 This project uses the Drain log parser available through the [Logparser toolkit](https://github.com/logpai/logparser). The Logparser toolkit provides multiple automated log parsing methods to create structured logs (also referred to as message template extraction). Logparser was created as part of an evaluation of various parsers:
