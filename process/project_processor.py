@@ -9,9 +9,9 @@ from sliding_window_processor import collect_event_ids, FeatureExtractor
 
 if __name__ == "__main__":
 
-    data_version = "v5"
+    data_version = "_v5"
 
-    data_version = "_tf-idf_rolling_{}".format(data_version)
+    data_version = "_tf-idf{}".format(data_version)
 
     # where the "raw" data for this file is located
     load_data_location = "../../project_processed_data/"

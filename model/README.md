@@ -49,10 +49,6 @@ The model results are provided in the following tables. The metrics indicate tha
 
 Note that `anomaly_nn.ipynb` can either be run from [colab](https://colab.research.google.com/) or locally.
 
-**Mitch to fill in details here**
+To Run the model on colab the data need to be in `"./drive/MyDrive/log_data/"`
 
-
-And the train and test data should be uploaded to google drive.  
-When running the model's notebook the user will be prompted to link their google drive.  
-
-The data needs to be in `"./drive/MyDrive/log_data/data_(data_version)/"`
+And to run the model locally the data needs to be in `../process/project_processed_data/`
