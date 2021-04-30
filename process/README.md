@@ -1,6 +1,6 @@
 # Process Folder
 
-Contains code to extract features from the structured log files produced within the `parse` directory. The data generated in this folder is used directly by the CNN model for log anomaly detection.
+Contains code to extract features from the structured log files produced within the [parse](../parse) directory. The data generated in this folder is used directly by the CNN model for log anomaly detection.
 
 ## Feature Extraction Overview
 
