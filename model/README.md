@@ -22,8 +22,8 @@ The model results are provided in the following tables. The metrics indicate tha
 
 |  | True Normal | True Anomalous |
 | --- | ---: | ---: |
-| **Model Normal** | 305,715 | 12 |
-| **Model Anomalous** | 62 | 9,813 |
+| **Model Normal** | 305,731 | 22 |
+| **Model Anomalous** | 46 | 9,808 |
 
 <br>
 
@@ -31,8 +31,8 @@ The model results are provided in the following tables. The metrics indicate tha
 
 |  | True Normal | True Anomalous |
 | --- | ---: | ---: |
-| **Model Normal** | 118,554 | 3 |
-| **Model Anomalous** | 0 | 1980 |
+| **Model Normal** | 118,553 | 5 |
+| **Model Anomalous** | 1 | 1978 |
 
 <br>
 
@@ -40,8 +40,8 @@ The model results are provided in the following tables. The metrics indicate tha
 
 |  | Precision (%) | Recall (%) | F-Score (%) |
 | --- | ---: | ---: | ---: |
-| **Training** | 99.4 | 99.9 | 99.6
-| **Testing** | 100.0 | 99.8 | 99.9
+| **Training** | 99.5 | 99.8 | 99.7
+| **Testing** | 99.9 | 99.7 | 99.8
 
 <br>
 
