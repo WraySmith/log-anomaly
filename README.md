@@ -12,7 +12,7 @@ The log anomaly detection model was tested using HDFS log data and was able to a
 
 ## Data
 
-HDFS data was used in this project to test the log anomaly detector. The data is provided by the [Loghub collection](https://github.com/logpai/loghub):
+Hadoop Distributed File System (HDFS) log data was used in this project to test the log anomaly detector. The data is provided by the [Loghub collection](https://github.com/logpai/loghub):
 - Shilin He, Jieming Zhu, Pinjia He, Michael R. Lyu. [Loghub: A Large Collection of System Log Datasets towards Automated Log Analytics](https://arxiv.org/abs/2008.06448). *Arxiv*, 2020.
 
 Information on the HDFS data can be found [here](https://github.com/logpai/loghub/tree/master/HDFS).
