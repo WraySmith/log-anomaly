@@ -6,7 +6,7 @@ import os
 import numpy as np
 import pandas as pd
 import time
-from sliding_window_processor import collect_event_ids, FeatureExtractor
+from sliding_window_processor import collect_event_ids, FeatureExtractor, block_by_time
 import math
 
 if __name__ == "__main__":
@@ -27,7 +27,7 @@ if __name__ == "__main__":
         "window_size": window_size,
         "sliding_size": step_size,
     }
-    start = time.time()
+    timer_start = time.time()
 
     # load the train templates
 
@@ -44,53 +44,49 @@ if __name__ == "__main__":
     print("last")
     print(x_train.tail(1))
 
+    ##########################################
+    # TIME WINDOWING FUNCTION STARTS HERE
+    ##########################################
+
     df = x_train.copy(deep=True)
-    start = df["Timestamp"].values[0]
-    stop = df["Timestamp"].values[-1]
+    X, y = block_by_time(df, 25, 3600, 3600)
 
-    slide_size = 3600
-    window_size = 3600
-    sums = 0
-    time_block_labels = []
-    anomalous_counter = 0
-    num_time_windows = math.ceil((stop - start) / slide_size)
-    for i in range(0, num_time_windows + 1):
-        time_subset = df[
-            (df["Timestamp"] >= start) & (df["Timestamp"] < start + window_size)
-        ]
-        sums += len(time_subset)
-        is_anom_labels = set(time_subset["Label"].unique()) - set(["-"])
-        if is_anom_labels:
-            print("anomalous")
-            anomalous_counter += 1
-        print(is_anom_labels)
-        # exit()
-        # if ():
-        #     # if (
-        #     #     len(time_subset[time_subset["Label"] == "-"])
-        #     #     - len(time_subset[time_subset["Label"] != "-"])
-        #     #     > 0
-        #     # ):
-        #     anomalous_counter += 1
-        #     print("anomalyous")
-        start += slide_size
+    # event_id_minimum_count = 25
 
-    print(sums)
-    print(anomalous_counter)
-    exit(0)
+    # start = df["Timestamp"].values[0]
+    # stop = df["Timestamp"].values[-1]
 
-    # windows rows based on time value
+    # # Drop rare events
+    # event_id_count = df.groupby(["EventId"])["Timestamp"].describe()[["count"]]
+    # event_id_filtered = event_id_count[event_id_count["count"] > event_id_minimum_count]
+    # event_id_filtered = set(event_id_filtered.index.values)
+    # df = df[df["EventId"].isin(event_id_filtered)]
 
-    # get first time stamp, caluclate + window size
-    # this becomes our first "block"
-    # all collect all events in range start & end
+    # # Create X and y by windowing on time
+    # slide_size = 3600
+    # window_size = 3600
+    # time_block_labels = []
+    # X = []
+    # num_time_windows = math.ceil((stop - start) / slide_size)
+    # for i in range(0, num_time_windows + 1):
+    #     time_subset = df[
+    #         (df["Timestamp"] >= start) & (df["Timestamp"] < start + window_size)
+    #     ]
 
-    # first data point in new smaller dataframe becomes start
-    # etc...
+    #     # Collect the y's
+    #     is_anom_labels = set(time_subset["Label"].unique()) - set(["-"])
+    #     if is_anom_labels:
+    #         is_anomalous = 1
+    #     else:
+    #         is_anomalous = 0
+    #     time_block_labels.append(is_anomalous)
+
+    #     # Collect the X's
+    #     X.append(time_subset["EventId"].values)
+
+    #     # Increment window start
+    #     start += slide_size
 
     # assumes data has been sorted by time
 
-    # actually can start at start time and calculate hours until end time
-    # a priori
-
-    print("time taken: ", time.time() - start)
+    print("time taken: ", time.time() - timer_start)

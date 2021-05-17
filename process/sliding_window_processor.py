@@ -1,12 +1,59 @@
 """
 loads and preprocesses the structured log data for anomaly prediction
 """
+import math
 import numpy as np
 import pandas as pd
 import re
 from collections import OrderedDict
 from collections import Counter
 from PIL import Image
+
+
+def block_by_time(df, event_id_minimum_count=0, slide_size=3600, window_size=3600):
+    """
+    Turns parsed data into X and y, where blocks of X are based on time windows
+
+    df : pandas dataframe
+    event_id_minimum_count : int, drops rare event ids that appear less times than this value
+    slide_size : int, by how much to slide the time window by, default is 3600 which is 1 hour
+    window_size : how wide the time window is, default is 3600 which is 1 hour
+    """
+
+    # Calculate number of time windows
+    start = df["Timestamp"].values[0]
+    stop = df["Timestamp"].values[-1]
+    num_time_windows = math.ceil((stop - start) / slide_size)
+
+    # Drop rare events
+    event_id_count = df.groupby(["EventId"])["Timestamp"].describe()[["count"]]
+    event_id_filtered = event_id_count[event_id_count["count"] > event_id_minimum_count]
+    event_id_filtered = set(event_id_filtered.index.values)
+    df = df[df["EventId"].isin(event_id_filtered)]
+
+    # Create X and y by windowing on time
+    y = []
+    X = []
+    for i in range(0, num_time_windows + 1):
+        time_subset = df[
+            (df["Timestamp"] >= start) & (df["Timestamp"] < start + window_size)
+        ]
+
+        # Collect the y's
+        is_anom_labels = set(time_subset["Label"].unique()) - set(["-"])
+        if is_anom_labels:
+            is_anomalous = 1
+        else:
+            is_anomalous = 0
+        y.append(is_anomalous)
+
+        # Collect the X's
+        X.append(time_subset["EventId"].values)
+
+        # Increment window start
+        start += slide_size
+
+    return X, y
 
 
 def collect_event_ids(data_frame, regex_pattern, column_names):

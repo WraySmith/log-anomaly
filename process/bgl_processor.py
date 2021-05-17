@@ -5,7 +5,7 @@ loads the semi-structured BGL drain data, and processes it for the CNN
 import numpy as np
 import pandas as pd
 import time
-from sliding_window_processor import collect_event_ids, FeatureExtractor
+from sliding_window_processor import collect_event_ids, FeatureExtractor, block_by_time
 
 if __name__ == "__main__":
 
@@ -19,24 +19,42 @@ if __name__ == "__main__":
 
     # Loads data
     print("loading x_train")
-    x_train = pd.read_csv("{}BGL_train.log_structured.csv".format(load_data_location))
-
+    train_data = pd.read_csv(
+        "{}BGL_train.log_structured.csv".format(load_data_location)
+    )
     print("loading x_test")
-    x_test = pd.read_csv("{}BGL_test.log_structured.csv".format(load_data_location))
+    test_data = pd.read_csv("{}BGL_test.log_structured.csv".format(load_data_location))
 
-    # print("loading y")
-    # y = pd.read_csv("{}anomaly_label.csv".format(load_data_location))
+    # time windows
+    sliding_size = 3600
+    window_size = 3600
+    event_min_count = 25
+    x_train, y_train = block_by_time(
+        train_data, event_min_count, sliding_size, window_size
+    )
+    x_test, y_test = block_by_time(
+        test_data, event_min_count, sliding_size, window_size
+    )
 
-    pd.set_option("display.max_columns", None)
+    # fit transform & transform
+    fe = FeatureExtractor()
+    print("fit_transform x_train")
+    subblocks_train = fe.fit_transform(
+        x_train, term_weighting="tf-idf", length_percentile=95, window_size=16,
+    )
+    print("transform x_test")
+    subblocks_test = fe.transform(x_test)
 
-    print(x_train.head())
-    print(x_train.columns)
-    print(x_train.shape)
+    # saving files
+    print("writing y to csv")
+    y_train = pd.Series(y_train)
+    y_test = pd.Series(y_test)
 
-    x_train_head = x_train.head(100000)
+    y_train.to_csv("{}bgl_y_train.csv".format(save_location))
+    y_test.to_csv("{}bgl_y_test.csv".format(save_location))
 
-    print(x_train_head.shape)
+    print("saving x to numpy object")
+    np.save("{}bgl_x_train.npy".format(save_location), subblocks_train)
+    np.save("{}bgl_x_test.npy".format(save_location), subblocks_test)
 
-    x_train_head.to_csv("{}x_train_head.csv".format(save_location))
-
-    print("time taken: ", time.time() - start)
+    print("time taken :", time.time() - start)
