@@ -24,6 +24,8 @@ def block_by_time(df, event_id_minimum_count=0, slide_size=3600, window_size=360
     start = df["Timestamp"].values[0]
     stop = df["Timestamp"].values[-1]
     num_time_windows = math.ceil((stop - start) / slide_size)
+    print("hours:", (stop - start) / slide_size)
+    print("num time windows", num_time_windows)
 
     # Drop rare events
     event_id_count = df.groupby(["EventId"])["Timestamp"].describe()[["count"]]
@@ -34,7 +36,7 @@ def block_by_time(df, event_id_minimum_count=0, slide_size=3600, window_size=360
     # Create X and y by windowing on time
     y = []
     X = []
-    for i in range(0, num_time_windows + 1):
+    for i in range(0, num_time_windows):
         time_subset = df[
             (df["Timestamp"] >= start) & (df["Timestamp"] < start + window_size)
         ]

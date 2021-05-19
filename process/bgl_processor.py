@@ -25,6 +25,25 @@ if __name__ == "__main__":
     print("loading x_test")
     test_data = pd.read_csv("{}BGL_test.log_structured.csv".format(load_data_location))
 
+    ##### ##### ##### ##### #####
+    # DELETE AFTER TESTING
+    ##### ##### ##### ##### #####
+
+    print("Number of train hours")
+    start = train_data.head(1)["Timestamp"].values
+    end = train_data.tail(1)["Timestamp"].values
+    print((end - start) / 3600)
+
+    print("Number of test hours")
+    start = test_data.head(1)["Timestamp"].values
+    end = test_data.tail(1)["Timestamp"].values
+    print((end - start) / 3600)
+
+    exit(0)
+    ##### ##### ##### ##### #####
+    # DELETE AFTER TESTING
+    ##### ##### ##### ##### #####
+
     # time windows
     sliding_size = 3600
     window_size = 3600

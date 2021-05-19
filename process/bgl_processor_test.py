@@ -36,57 +36,28 @@ if __name__ == "__main__":
     # drop if less than desired threshold
 
     # Loads data
-    print("loading x_train")
-    x_train = pd.read_csv("{}x_train_head.csv".format(load_data_location))
+    # print("loading x_train")
+    # x_train = pd.read_csv("{}x_train_head.csv".format(load_data_location))
 
-    print("first")
-    print(x_train.head(100))
-    print("last")
-    print(x_train.tail(1))
+    # print("first")
+    # print(x_train.head(100))
+    # print("last")
+    # print(x_train.tail(1))
 
-    ##########################################
-    # TIME WINDOWING FUNCTION STARTS HERE
-    ##########################################
+    # train_data = np.load("{}bgl_x_train.npy".format(load_data_location))
+    # test_data = np.load("{}bgl_x_test.npy".format(load_data_location))
 
-    df = x_train.copy(deep=True)
-    X, y = block_by_time(df, 25, 3600, 3600)
+    y_train = pd.read_csv(
+        "{}bgl_y_train.csv".format(load_data_location), index_col=None
+    )
+    y_test = pd.read_csv("{}bgl_y_test.csv".format(load_data_location))
 
-    # event_id_minimum_count = 25
+    import statistics
 
-    # start = df["Timestamp"].values[0]
-    # stop = df["Timestamp"].values[-1]
+    y_train = list(y_train.iloc[:, 1].values)
+    y_test = list(y_test.iloc[:, 1].values)
 
-    # # Drop rare events
-    # event_id_count = df.groupby(["EventId"])["Timestamp"].describe()[["count"]]
-    # event_id_filtered = event_id_count[event_id_count["count"] > event_id_minimum_count]
-    # event_id_filtered = set(event_id_filtered.index.values)
-    # df = df[df["EventId"].isin(event_id_filtered)]
-
-    # # Create X and y by windowing on time
-    # slide_size = 3600
-    # window_size = 3600
-    # time_block_labels = []
-    # X = []
-    # num_time_windows = math.ceil((stop - start) / slide_size)
-    # for i in range(0, num_time_windows + 1):
-    #     time_subset = df[
-    #         (df["Timestamp"] >= start) & (df["Timestamp"] < start + window_size)
-    #     ]
-
-    #     # Collect the y's
-    #     is_anom_labels = set(time_subset["Label"].unique()) - set(["-"])
-    #     if is_anom_labels:
-    #         is_anomalous = 1
-    #     else:
-    #         is_anomalous = 0
-    #     time_block_labels.append(is_anomalous)
-
-    #     # Collect the X's
-    #     X.append(time_subset["EventId"].values)
-
-    #     # Increment window start
-    #     start += slide_size
-
-    # assumes data has been sorted by time
+    print(sum(y_train) / len(y_train))
+    print(sum(y_test) / len(y_test))
 
     print("time taken: ", time.time() - timer_start)
