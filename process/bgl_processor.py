@@ -9,6 +9,8 @@ from sliding_window_processor import collect_event_ids, FeatureExtractor, block_
 
 if __name__ == "__main__":
 
+    save_name_extention = "overlap_half_hour"
+
     # where the "raw" data for this file is located
     load_data_location = "../../project_processed_data/"
 
@@ -26,7 +28,7 @@ if __name__ == "__main__":
     test_data = pd.read_csv("{}BGL_test.log_structured.csv".format(load_data_location))
 
     # time windows
-    sliding_size = 3600
+    sliding_size = int(3600 / 2)
     window_size = 3600
     event_min_count = 25
     x_train, y_train = block_by_time(
@@ -40,7 +42,10 @@ if __name__ == "__main__":
     fe = FeatureExtractor()
     print("fit_transform x_train")
     subblocks_train = fe.fit_transform(
-        x_train, term_weighting="tf-idf", length_percentile=95, window_size=16,
+        x_train,
+        term_weighting="tf-idf",
+        length_percentile=95,
+        window_size=16,
     )
     print("transform x_test")
     subblocks_test = fe.transform(x_test)
@@ -50,11 +55,16 @@ if __name__ == "__main__":
     y_train = pd.Series(y_train)
     y_test = pd.Series(y_test)
 
-    y_train.to_csv("{}bgl_y_train.csv".format(save_location))
-    y_test.to_csv("{}bgl_y_test.csv".format(save_location))
+    y_train.to_csv("{}bgl_y_train_{}.csv".format(save_location, save_name_extention))
+    y_test.to_csv("{}bgl_y_test_{}.csv".format(save_location, save_name_extention))
 
     print("saving x to numpy object")
-    np.save("{}bgl_x_train.npy".format(save_location), subblocks_train)
-    np.save("{}bgl_x_test.npy".format(save_location), subblocks_test)
+    np.save(
+        "{}bgl_x_train_{}.npy".format(save_location, save_name_extention),
+        subblocks_train,
+    )
+    np.save(
+        "{}bgl_x_test_{}.npy".format(save_location, save_name_extention), subblocks_test
+    )
 
     print("time taken :", time.time() - start)
