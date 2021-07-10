@@ -20,6 +20,10 @@ This project uses the framework of Loglizer's feature extraction but uses the fo
 
  <img src="../images/Figure4.PNG" alt="Feature Extraction Process" width="400"/>
 
+This feature extraction process is also similar to the approach used in:
+
+- H. Li and Y. Li, LogSpy: System Log Anomaly Detection for Distributed Systems, 2020 International Conference on Artificial Intelligence and Computer Engineering (ICAICE), 2020, pp. 347-352, doi: 10.1109/ICAICE51518.2020.00073.
+
 ## Data and Scripts
 
 The following provides a description of the files located in this folder:
