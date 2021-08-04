@@ -9,6 +9,8 @@ from sliding_window_processor import collect_event_ids, FeatureExtractor, block_
 
 if __name__ == "__main__":
 
+    chunk_size = 400
+
     save_name_extention = "overlap_half_hour"
 
     # where the "raw" data for this file is located
@@ -38,6 +40,50 @@ if __name__ == "__main__":
         test_data, event_min_count, sliding_size, window_size
     )
 
+    def chunks(lst, n):
+        """Yield successive n-sized chunks from lst."""
+        for i in range(0, len(lst), n):
+            yield lst[i : i + n]
+
+    x_train_chunks = chunks(x_train, chunk_size)
+    y_train_chunks = chunks(y_train, chunk_size)
+
+    x_train_chunks = list(x_train_chunks)
+    y_train_chunks = list(y_train_chunks)
+
+    for i in range(len(x_train_chunks)):
+        print("proccessing block {}".format(i))
+        x_chunk = x_train_chunks[i]
+        y_chunk = y_train_chunks[i]
+
+        fe = FeatureExtractor()
+        print("fit_transform x_train")
+        subblocks_train = fe.fit_transform(
+            x_train,
+            term_weighting="tf-idf",
+            length_percentile=95,
+            window_size=16,
+        )
+
+        y_chunk = pd.Series(y_chunk)
+        y_chunk.to_csv(
+            "{}bgl_y_train_{}_{}.csv".format(save_location, save_name_extention, i)
+        )
+        np.save(
+            "{}bgl_x_train_{}_{}.npy".format(save_location, save_name_extention, i),
+            subblocks_train,
+        )
+
+    print("transform x_test")
+    subblocks_test = fe.transform(x_test)
+    y_test = pd.Series(y_test)
+    y_test.to_csv("{}bgl_y_test_{}.csv".format(save_location, save_name_extention))
+    np.save(
+        "{}bgl_x_test_{}.npy".format(save_location, save_name_extention), subblocks_test
+    )
+
+    exit()
+
     # fit transform & transform
     fe = FeatureExtractor()
     print("fit_transform x_train")
@@ -52,17 +98,12 @@ if __name__ == "__main__":
 
     # saving files
     print("writing y to csv")
-    y_train = pd.Series(y_train)
+
+    # save the train
+
+    # save the test
     y_test = pd.Series(y_test)
-
-    y_train.to_csv("{}bgl_y_train_{}.csv".format(save_location, save_name_extention))
     y_test.to_csv("{}bgl_y_test_{}.csv".format(save_location, save_name_extention))
-
-    print("saving x to numpy object")
-    np.save(
-        "{}bgl_x_train_{}.npy".format(save_location, save_name_extention),
-        subblocks_train,
-    )
     np.save(
         "{}bgl_x_test_{}.npy".format(save_location, save_name_extention), subblocks_test
     )
