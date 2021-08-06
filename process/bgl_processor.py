@@ -9,7 +9,7 @@ from sliding_window_processor import collect_event_ids, FeatureExtractor, block_
 
 if __name__ == "__main__":
 
-    chunk_size = 400
+    chunk_size = 800
 
     save_name_extention = "overlap_half_hour"
 
@@ -27,7 +27,8 @@ if __name__ == "__main__":
         "{}BGL_train.log_structured.csv".format(load_data_location)
     )
     print("loading x_test")
-    test_data = pd.read_csv("{}BGL_test.log_structured.csv".format(load_data_location))
+    test_data = pd.read_csv(
+        "{}BGL_test.log_structured.csv".format(load_data_location))
 
     # time windows
     sliding_size = int(3600 / 2)
@@ -43,13 +44,20 @@ if __name__ == "__main__":
     def chunks(lst, n):
         """Yield successive n-sized chunks from lst."""
         for i in range(0, len(lst), n):
-            yield lst[i : i + n]
+            yield lst[i: i + n]
+
+    print("size of full x train", len(x_train))
 
     x_train_chunks = chunks(x_train, chunk_size)
     y_train_chunks = chunks(y_train, chunk_size)
 
     x_train_chunks = list(x_train_chunks)
     y_train_chunks = list(y_train_chunks)
+
+    print("number of chunks", len(x_train_chunks))
+    print("length insisde chunk", len(x_train_chunks[0]))
+
+    print("size of x_test", len(x_test))
 
     for i in range(len(x_train_chunks)):
         print("proccessing block {}".format(i))
@@ -59,7 +67,7 @@ if __name__ == "__main__":
         fe = FeatureExtractor()
         print("fit_transform x_train")
         subblocks_train = fe.fit_transform(
-            x_train,
+            x_chunk,
             term_weighting="tf-idf",
             length_percentile=95,
             window_size=16,
@@ -67,19 +75,25 @@ if __name__ == "__main__":
 
         y_chunk = pd.Series(y_chunk)
         y_chunk.to_csv(
-            "{}bgl_y_train_{}_{}.csv".format(save_location, save_name_extention, i)
+            "{}bgl_y_train_{}_{}.csv".format(
+                save_location, save_name_extention, i)
         )
         np.save(
-            "{}bgl_x_train_{}_{}.npy".format(save_location, save_name_extention, i),
+            "{}bgl_x_train_{}_{}.npy".format(
+                save_location, save_name_extention, i),
             subblocks_train,
         )
+
+    exit()
 
     print("transform x_test")
     subblocks_test = fe.transform(x_test)
     y_test = pd.Series(y_test)
-    y_test.to_csv("{}bgl_y_test_{}.csv".format(save_location, save_name_extention))
+    y_test.to_csv("{}bgl_y_test_{}.csv".format(
+        save_location, save_name_extention))
     np.save(
-        "{}bgl_x_test_{}.npy".format(save_location, save_name_extention), subblocks_test
+        "{}bgl_x_test_{}.npy".format(
+            save_location, save_name_extention), subblocks_test
     )
 
     exit()
@@ -103,9 +117,11 @@ if __name__ == "__main__":
 
     # save the test
     y_test = pd.Series(y_test)
-    y_test.to_csv("{}bgl_y_test_{}.csv".format(save_location, save_name_extention))
+    y_test.to_csv("{}bgl_y_test_{}.csv".format(
+        save_location, save_name_extention))
     np.save(
-        "{}bgl_x_test_{}.npy".format(save_location, save_name_extention), subblocks_test
+        "{}bgl_x_test_{}.npy".format(
+            save_location, save_name_extention), subblocks_test
     )
 
     print("time taken :", time.time() - start)
