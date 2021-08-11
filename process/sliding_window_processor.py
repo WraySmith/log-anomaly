@@ -29,7 +29,8 @@ def block_by_time(df, event_id_minimum_count=0, slide_size=3600, window_size=360
 
     # Drop rare events
     event_id_count = df.groupby(["EventId"])["Timestamp"].describe()[["count"]]
-    event_id_filtered = event_id_count[event_id_count["count"] > event_id_minimum_count]
+    event_id_filtered = event_id_count[event_id_count["count"]
+                                       > event_id_minimum_count]
     event_id_filtered = set(event_id_filtered.index.values)
     df = df[df["EventId"].isin(event_id_filtered)]
 
@@ -38,7 +39,8 @@ def block_by_time(df, event_id_minimum_count=0, slide_size=3600, window_size=360
     X = []
     for i in range(0, num_time_windows):
         time_subset = df[
-            (df["Timestamp"] >= start) & (df["Timestamp"] < start + window_size)
+            (df["Timestamp"] >= start) & (
+                df["Timestamp"] < start + window_size)
         ]
 
         # Collect the y's
@@ -121,9 +123,10 @@ class FeatureExtractor(object):
         self.max_seq_length = None
         self.window_size = None
         self.num_rows = None
+        self.length_override = None
 
     def fit_transform(
-        self, X_seq, term_weighting=None, length_percentile=90, window_size=16
+        self, X_seq, term_weighting=None, length_percentile=90, window_size=16, max_seq_length_override=None, events_override=None
     ):
         """
         Fit and transform the training set
@@ -136,11 +139,18 @@ class FeatureExtractor(object):
         self.window_size = window_size
 
         # get unique events
-        self.events = set(np.concatenate(X_seq).ravel().flatten())
+        if events_override:
+            self.events = events_override
+        else:
+            self.events = set(np.concatenate(X_seq).ravel().flatten())
+        print(self.events)
 
         # get lengths of event sequences
         length_list = np.array(list(map(len, X_seq)))
-        self.max_seq_length = int(np.percentile(length_list, length_percentile))
+        self.max_seq_length = int(
+            np.percentile(length_list, length_percentile))
+        if max_seq_length_override:
+            self.max_seq_length = max_seq_length_override
 
         self.num_rows = self.max_seq_length - self.window_size + 1
 
@@ -148,18 +158,46 @@ class FeatureExtractor(object):
 
         # loop over each sequence to create the time image
         time_images = []
+
+        # logging
+        block_counter = 0
         for block in X_seq:
+
+            # logging
+            block_counter += 1
+            f = open("second_for_loop_block.txt", "w")
+            f.write(f"\n block {block_counter}")
+            f.close()
+
             padded_block = sequence_padder(block, self.max_seq_length)
             time_image = windower(padded_block, self.window_size)
             time_image_counts = []
+
+            # logging
+            time_row_counter = 0
+            f = open("third_for_loop_time_row.txt", "w")
+            f.write(f"")
+            f.close()
             for time_row in time_image:
+
+                # logging
+                time_row_counter += 1
+                f = open("third_for_loop_time_row.txt", "w")
+                f.write(f"\n time_row {time_row_counter}")
+                f.close()
+
+                if (time_row_counter == 22682 and block_counter == 400):
+                    print("asdf")
+
                 row_count = Counter(time_row)
                 time_image_counts.append(row_count)
 
-            time_image_df = pd.DataFrame(time_image_counts, columns=self.events)
-            time_image_df = time_image_df.reindex(sorted(time_image_df.columns), axis=1)
+            time_image_df = pd.DataFrame(
+                time_image_counts, columns=self.events)
+            time_image_df = time_image_df.reindex(
+                sorted(time_image_df.columns), axis=1)
             time_image_df = time_image_df.fillna(0)
-            time_image_np = time_image_df.to_numpy()
+            time_image_np = time_image_df.to_numpy(dtype="float32")
 
             # resize if too large
             if len(time_image_np) > self.num_rows:
@@ -208,10 +246,12 @@ class FeatureExtractor(object):
                 row_count = Counter(time_row)
                 time_image_counts.append(row_count)
 
-            time_image_df = pd.DataFrame(time_image_counts, columns=self.events)
-            time_image_df = time_image_df.reindex(sorted(time_image_df.columns), axis=1)
+            time_image_df = pd.DataFrame(
+                time_image_counts, columns=self.events)
+            time_image_df = time_image_df.reindex(
+                sorted(time_image_df.columns), axis=1)
             time_image_df = time_image_df.fillna(0)
-            time_image_np = time_image_df.to_numpy()
+            time_image_np = time_image_df.to_numpy(dtype="float32")
 
             # resize if too large
             if len(time_image_np) > self.num_rows:
@@ -222,6 +262,7 @@ class FeatureExtractor(object):
             time_images.append(time_image_np)
 
         # stack all the blocks
+        print("stacking time images into a single np array")
         X = np.stack(time_images)
 
         if self.term_weighting == "tf-idf":

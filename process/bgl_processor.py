@@ -9,7 +9,7 @@ from sliding_window_processor import collect_event_ids, FeatureExtractor, block_
 
 if __name__ == "__main__":
 
-    chunk_size = 800
+    chunk_size = 400
 
     save_name_extention = "overlap_half_hour"
 
@@ -20,6 +20,9 @@ if __name__ == "__main__":
     save_location = "../../project_processed_data/"
 
     start = time.time()
+
+    import os
+    cwd = os.getcwd()
 
     # Loads data
     print("loading x_train")
@@ -59,7 +62,19 @@ if __name__ == "__main__":
 
     print("size of x_test", len(x_test))
 
+    # over rides for multiple chunks
+    override_events = set(np.concatenate(x_train).ravel().flatten())
+    length_list = np.array(list(map(len, x_train)))
+    override_lenghts = int(
+        np.percentile(length_list, 95))
+
     for i in range(len(x_train_chunks)):
+
+        # logging
+        f = open("out_side_for_loop_chunks.txt", "w")
+        f.write(f"\n chunk {i}")
+        f.close()
+
         print("proccessing block {}".format(i))
         x_chunk = x_train_chunks[i]
         y_chunk = y_train_chunks[i]
@@ -68,9 +83,11 @@ if __name__ == "__main__":
         print("fit_transform x_train")
         subblocks_train = fe.fit_transform(
             x_chunk,
-            term_weighting="tf-idf",
+            term_weighting=None,
             length_percentile=95,
             window_size=16,
+            max_seq_length_override=override_lenghts,
+            events_override=override_events
         )
 
         y_chunk = pd.Series(y_chunk)
@@ -103,7 +120,7 @@ if __name__ == "__main__":
     print("fit_transform x_train")
     subblocks_train = fe.fit_transform(
         x_train,
-        term_weighting="tf-idf",
+        term_weighting=None,
         length_percentile=95,
         window_size=16,
     )
