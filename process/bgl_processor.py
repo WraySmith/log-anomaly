@@ -101,8 +101,6 @@ if __name__ == "__main__":
             subblocks_train,
         )
 
-    exit()
-
     print("transform x_test")
     subblocks_test = fe.transform(x_test)
     y_test = pd.Series(y_test)
@@ -112,7 +110,7 @@ if __name__ == "__main__":
         "{}bgl_x_test_{}.npy".format(
             save_location, save_name_extention), subblocks_test
     )
-
+    print("time taken :", time.time() - start)
     exit()
 
     # fit transform & transform
@@ -140,5 +138,3 @@ if __name__ == "__main__":
         "{}bgl_x_test_{}.npy".format(
             save_location, save_name_extention), subblocks_test
     )
-
-    print("time taken :", time.time() - start)

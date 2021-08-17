@@ -163,31 +163,31 @@ class FeatureExtractor(object):
         block_counter = 0
         for block in X_seq:
 
-            # logging
-            block_counter += 1
-            f = open("second_for_loop_block.txt", "w")
-            f.write(f"\n block {block_counter}")
-            f.close()
+            # # logging
+            # block_counter += 1
+            # f = open("second_for_loop_block.txt", "w")
+            # f.write(f"\n block {block_counter}")
+            # f.close()
 
             padded_block = sequence_padder(block, self.max_seq_length)
             time_image = windower(padded_block, self.window_size)
             time_image_counts = []
 
-            # logging
-            time_row_counter = 0
-            f = open("third_for_loop_time_row.txt", "w")
-            f.write(f"")
-            f.close()
+            # # logging
+            # time_row_counter = 0
+            # f = open("third_for_loop_time_row.txt", "w")
+            # f.write(f"")
+            # f.close()
             for time_row in time_image:
 
-                # logging
-                time_row_counter += 1
-                f = open("third_for_loop_time_row.txt", "w")
-                f.write(f"\n time_row {time_row_counter}")
-                f.close()
+                # # logging
+                # time_row_counter += 1
+                # f = open("third_for_loop_time_row.txt", "w")
+                # f.write(f"\n time_row {time_row_counter}")
+                # f.close()
 
-                if (time_row_counter == 22682 and block_counter == 400):
-                    print("asdf")
+                # if (time_row_counter == 22682 and block_counter == 400):
+                #     print("asdf")
 
                 row_count = Counter(time_row)
                 time_image_counts.append(row_count)
