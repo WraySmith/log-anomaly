@@ -143,7 +143,7 @@ class FeatureExtractor(object):
             self.events = events_override
         else:
             self.events = set(np.concatenate(X_seq).ravel().flatten())
-        print(self.events)
+        # print(self.events)
 
         # get lengths of event sequences
         length_list = np.array(list(map(len, X_seq)))
@@ -207,21 +207,38 @@ class FeatureExtractor(object):
 
             time_images.append(time_image_np)
 
+        # free memory
+        import gc
+        print("freeing memory")
+        del X_seq
+        gc.collect()
+
         # stack all the blocks
         X = np.stack(time_images)
+        # del time_images
+        # gc.collect()
+
+        print("this is the hook")
 
         if self.term_weighting == "tf-idf":
+            print("here")
 
             # set up sizing
             dim1, dim2, dim3 = X.shape
             X = X.reshape(-1, dim3)
-
+            print("step two")
             # apply tf-idf
             df_vec = np.sum(X > 0, axis=0)
+            print(df_vec.shape)
+            print("here")
             self.idf_vec = np.log(dim1 / (df_vec + 1e-8))
+            print("three")
             idf_tile = np.tile(self.idf_vec, (dim1 * dim2, 1))
+            print("four")
             idf_matrix = X * idf_tile
+            print("five")
             X = idf_matrix
+            print("six")
 
             # reshape to original dimensions
             X = X.reshape(dim1, dim2, dim3)
